@@ -1,3 +1,7 @@
+const dotenv = require('dotenv');
+dotenv.config();
+const sha256 = require("crypto-js/sha256");
+
 class UnspentTxOut {
     constructor(txOutId, txOutIndex, address, amount) {
         this.txOutId = txOutId;
@@ -25,8 +29,11 @@ class TxOut {
 class Transaction {
     constructor(){
         this.id = ""
-        this.TxIns = []
-        this.txOuts = []
+        this.txIns = [{'signature': '', 'txOutId': '', 'txOutIndex': 0}]
+        this.txOuts = [{
+            'address': '044a916f2a55fc5233b4f335da34e9bd40f2435c23ee9b534c3a607c3fedf64534b57aeaab6f8593a1d5c4c2829067ba5ceb36a507df1d6274648e2f1ba462a821',
+            'amount': 500
+        }]
     }
 
     // return string
@@ -39,7 +46,7 @@ class Transaction {
             .map((txOut) => txOut.address + txOut.amount)
             .reduce((a, b) => a + b, '');
     
-        return CryptoJS.SHA256(txInContent + txOutContent).toString();
+        return sha256(txInContent + txOutContent).toString();
     };
 
     //check valid transaction
@@ -81,4 +88,33 @@ class Transaction {
             return false;
         }
     }
+    
+}
+
+const getCoinbaseTransaction = (minerAddress, blockIndex) => {
+    const t = new Transaction();
+    const txIn = new TxIn();
+    txIn.signature = '';
+    txIn.txOutId = '';
+    txIn.txOutIndex = blockIndex;
+
+    t.txIns = [txIn];
+    t.txOuts = [new TxOut(minerAddress, process.env.COINBASE_AMOUNT)];
+    t.id = getTransactionId(t);
+    return t;
+};
+
+const addTransaction = (receiverAddress, amount, minerAddress, hash) => {
+    const transactionCoinBase =  getCoinbaseTransaction(minerAddress, getBlockChain().getLast().index + 1)
+
+    const newBlock= new Block(blockChain.getLast().index + 1, blockChain.getLast().prevHash, data.data, blockChain.difficulty, hash);
+    if(getBlockChain().addBlock(newBlock))
+    {
+        res.send(newBlock);
+        return;
+    }
+}
+
+module.exports = {
+    Transaction
 }

@@ -12,18 +12,23 @@ const initHttpServer = (myHttpPort) => {
         res.send(getBlockChain().chain);
     });
 
+    app.get('/transaction/:id', (req, res) => {
+        
+    });
+
     app.post('/mineBlock', (req, res) => {
-        if (req.body === null) {
-            res.send('data parameter is missing');
-            return;
-        }
-        const data = req.body;
-        const newBlock= new Block(data.index, data.prevHash, data.data, data.difficulty, data.timestamp, data.hash);
-        if(!newBlock.valid())
-        {
-            res.send(false)
-        }
-        res.send(newBlock);
+        const transactionId = req.body.transactionId
+        const minerAddress = req.body.minerAddress;
+        const hash = req.body.hash
+
+        res.send(true)
+    });
+
+    app.post('createTransaction', (req, res) => {
+        const data = req.body.data
+        
+        
+        res.send(false);
     });
 
     app.get('/peers', (req, res) => {

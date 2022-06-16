@@ -1,9 +1,15 @@
 const Block = require('./block.js');
+const {broadcast} = require('./p2pServer')
+
+const genesisBlock = new Block(
+    0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', {
+        init: true
+    }, 1465154705, this.difficulty
+);
 
 class BlockChain{
     constructor(difficulty) {
-        const block = new Block(0,'',{init: true}, this.difficulty);
-        this.chain = [block]
+        this.chain = [genesisBlock]
         this.difficulty = difficulty
     }
 
@@ -11,15 +17,16 @@ class BlockChain{
         return this.chain[this.chain.length - 1]
     }
 
-    addBlock(data){
-        const newBlock = new Block(this.chain.length,this.getLast().hash,data, this.difficulty);
-        newBlock.mine(this.difficulty)
-
-        this.chain.push(newBlock)
+    addBlock(newBlock){
+        if (checkValidNewBlock(newBlock, this.getLast())) {
+            this.chain.push(newBlock);
+            return true;
+        }
+        return false;
     }
 
-    checkValid(){
-        for (let i=1;i<this.chain.length;i++) {
+    checkValid(chain){
+        for (let i=1;i<chain.length;i++) {
             const curBlock = this.chain[i];
             const preBlock = this.chain[i-1];
 
@@ -35,6 +42,36 @@ class BlockChain{
         }
         return true
     }
+
+    checkValidNewBlock(newBlock, preBlock){
+        if (this.getLast().index + 1 != newBlock.index)
+        {
+            return false;
+        }
+        if (preBlock.hash !== newBlock.prevHash)
+        {
+            return false;
+        }
+        if (newBlock.hash != newBlock.caculateHash())
+        {
+            return false;
+        }
+        if(!newBlock.hash.startsWith('0'.repeat(this.difficulty)))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    replaceChain(newBlocks){
+        if (this.checkValid(newBlocks) && newBlocks.length > this.chain.length) {
+            console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
+            this.chain = newBlocks;
+            broadcast(this.getLast());
+        } else {
+            console.log('Received blockchain invalid');
+        }
+    };
 }
 
 module.exports = BlockChain

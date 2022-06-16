@@ -1,4 +1,5 @@
 const { ioClient } = require("socket.io-client");
+const express = require('express');
 
 const sockets = [];
 
@@ -19,7 +20,7 @@ const initP2P = (p2pPort)=>{
     const http = require('http').Server(app);
 
     http.listen(p2pPort, () => {
-        console.log(`App listening on port ${p2pPort}!`);
+        console.log(`Socket listening on port: ${p2pPort}`);
     });
 
     const io = require('socket.io')(http,{
@@ -93,4 +94,5 @@ module.exports = {
     initP2P,
     conectPeer,
     getSockets,
+    broadcast,
 }

@@ -1,4 +1,6 @@
 const { conectPeer, getSockets } = require('./p2pServer')
+const bodyParser = require('body-parser');
+const express = require('express');
 
 const initHttpServer = ( myHttpPort) => {
     const app = express();
@@ -23,7 +25,7 @@ const initHttpServer = ( myHttpPort) => {
     });
     
     app.listen(myHttpPort, () => {
-        console.log('Listening http on port: ' + myHttpPort);
+        console.log(`App listening on port: ${myHttpPort}`);
     });
 };
 

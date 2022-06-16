@@ -42,5 +42,39 @@ class Transaction {
         return CryptoJS.SHA256(txInContent + txOutContent).toString();
     };
 
+    //check valid transaction
+    validateTransaction(){
+        if (typeof this.id !== 'string')
+        {
+            return false;
+        }
+        if (this.id !== this.getTransactionId())
+        {
+            return false;
+        }
+        if (this.validateTxIn() == false)
+        {
+            return false;
+        }
+        return true
+    }
 
+    validateTxIn(TxIn){
+        if (TxIn == null)
+        {
+            return false;
+        }
+        if (typeof TxIn.signature !== 'string')
+        {
+            return false;
+        }
+        if (TxIn.txOutIndex !== 'string')
+        {
+            return false;
+        }
+        if (typeof this.txIns !== 'string')
+        {
+            return false;
+        }
+    }
 }

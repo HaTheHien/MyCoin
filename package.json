@@ -21,6 +21,9 @@
     "dotenv": "^16.0.1",
     "elliptic": "^6.5.4",
     "fs": "^0.0.1-security",
-    "lodash": "^4.17.21"
+    "http": "^0.0.1-security",
+    "lodash": "^4.17.21",
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1"
   }
 }

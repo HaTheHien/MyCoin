@@ -1,10 +1,12 @@
 const { ioClient } = require("socket.io-client");
 const express = require('express');
+const { getBlockChain, BlockChain } = require("./blockChain");
 
 const sockets = [];
 
 const MessageType =  {
     "QUERY_LATEST": "QUERY_LATEST",
+    "RESPONSE_LASTBLOCK":"RESPONSE_LASTBLOCK",
     "QUERY_ALL":"QUERY_ALL",
     "RESPONSE_BLOCKCHAIN":"RESPONSE_BLOCKCHAIN",
     "QUERY_TRANSACTION_POOL":"QUERY_TRANSACTION_POOL",
@@ -25,9 +27,9 @@ const initP2P = (p2pPort)=>{
 
     const io = require('socket.io')(http,{
         cors: {
-        origin: '*',
+            origin: '*',
         }
-       })
+    })
 
     io.on('connection', (socket) => {
         console.log('P2P connection ');
@@ -40,38 +42,41 @@ const initP2P = (p2pPort)=>{
     });
 }
 
-const queryChainLengthMsg = () => ({'type': MessageType.QUERY_LATEST, 'data': null});
+const queryChainLengthMsg = (io) => io.emit(MessageType.QUERY_LATEST, null);
 
-const queryTransactionPoolMsg = () => ({
-    'type': MessageType.QUERY_TRANSACTION_POOL,
-    'data': null
-});
+const queryTransactionPoolMsg = (io) => io.emit(MessageType.QUERY_TRANSACTION_POOL, null)
 
 initHandleMessage = (io) =>{
     // listen
     io.on(MessageType.QUERY_LATEST,(data)=>{
-        io.emit()
+        io.emit(MessageType.RESPONSE_LASTBLOCK, getBlockChain().getLast())
     })
     io.on(MessageType.QUERY_ALL,(data)=>{
-        io.emit()
+        io.emit(MessageType.RESPONSE_BLOCKCHAIN,getBlockChain().chain)
     })
     io.on(MessageType.RESPONSE_BLOCKCHAIN,(data)=>{
-        io.emit()
+        getBlockChain().replaceChain(data)
+    })
+    io.on(MessageType.RESPONSE_LASTBLOCK,(data)=>{
+        if (getBlockChain().chain.length <= data.index)
+        {
+            io.emit(MessageType.QUERY_ALL)
+        }
     })
     io.on(MessageType.QUERY_TRANSACTION_POOL,(data)=>{
-        io.emit()
+        
     })
     io.on(MessageType.RESPONSE_TRANSACTION_POOL, (data)=>{
-        io.emit()
+        
     })
     
 }
 
 const initConnection = (io) => {
     initHandleMessage(io);
-    io.emit(MessageType.QUERY_LATEST, queryChainLengthMsg());
+    queryChainLengthMsg(io)
 
-    broadcast(queryTransactionPoolMsg());
+    queryTransactionPoolMsg(io);
 }
 
 const conectPeer = (domain) =>{
@@ -88,11 +93,8 @@ const conectPeer = (domain) =>{
     });
 }
 
-const broadcast = (message) => sockets.forEach((socket) => write(socket, message));
-
 module.exports = {
     initP2P,
     conectPeer,
     getSockets,
-    broadcast,
 }

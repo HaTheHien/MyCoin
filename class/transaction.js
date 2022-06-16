@@ -52,10 +52,14 @@ class Transaction {
         {
             return false;
         }
-        if (this.validateTxIn() == false)
+        for (var item in this.TxIns)
         {
-            return false;
+            if (this.validateTxIn(item) === false)
+            {
+                return false;
+            }
         }
+        
         return true
     }
 

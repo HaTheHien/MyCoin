@@ -1,17 +1,28 @@
 const { conectPeer, getSockets } = require('./p2pServer')
 const bodyParser = require('body-parser');
 const express = require('express');
+const { getBlockChain } = require('./blockChain');
+const Block = require('./block');
 
-const initHttpServer = ( myHttpPort) => {
+const initHttpServer = (myHttpPort) => {
     const app = express();
     app.use(bodyParser.json());
 
     app.get('/blocks', (req, res) => {
-        res.send(getBlockchain());
+        res.send(getBlockChain().chain);
     });
 
     app.post('/mineBlock', (req, res) => {
-        const newBlock= generateNextBlock(req.body.data);
+        if (req.body === null) {
+            res.send('data parameter is missing');
+            return;
+        }
+        const data = req.body;
+        const newBlock= new Block(data.index, data.prevHash, data.data, data.difficulty, data.timestamp, data.hash);
+        if(!newBlock.valid())
+        {
+            res.send(false)
+        }
         res.send(newBlock);
     });
 
@@ -22,6 +33,11 @@ const initHttpServer = ( myHttpPort) => {
     app.post('/addPeer', (req, res) => {
         conectPeer(req.body.peer);
         res.send();
+    });
+
+    app.post('/stop', (req, res) => {
+        res.send({'msg' : 'stopping server'});
+        process.exit();
     });
     
     app.listen(myHttpPort, () => {

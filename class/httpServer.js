@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const { getBlockChain } = require('./blockChain');
 const Block = require('./block');
+const { findTransaction, getTransactionPool } = require('./transactionPool');
+const { createTransaction } = require('./transaction');
 
 const initHttpServer = (myHttpPort) => {
     const app = express();
@@ -12,8 +14,12 @@ const initHttpServer = (myHttpPort) => {
         res.send(getBlockChain().chain);
     });
 
+    app.get('/transaction', (req, res) => {
+        res.send(getTransactionPool())
+    });
+
     app.get('/transaction/:id', (req, res) => {
-        
+        res.send(findTransaction(req.params.id))
     });
 
     app.post('/mineBlock', (req, res) => {
@@ -24,11 +30,21 @@ const initHttpServer = (myHttpPort) => {
         res.send(true)
     });
 
-    app.post('createTransaction', (req, res) => {
-        const data = req.body.data
+    app.post('/createTransaction', (req, res) => {
+        const data = req.body
+        if (data.txIns === null || data.txOuts === null || data.id === null) 
+        {
+            res.send(false);
+            return
+        }
         
+        if (createTransaction(data.txIns, data.txOuts, data.id) === false)
+        {
+            res.send(false)
+            return;
+        }
         
-        res.send(false);
+        res.send(true);
     });
 
     app.get('/peers', (req, res) => {

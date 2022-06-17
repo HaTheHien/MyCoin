@@ -6,9 +6,9 @@ class Block{
         this.index = index
         this.prevHash = prevHash
         this.data = data
+        this.difficulty = difficulty
         this.timestamp = new Date().getMilliseconds
         this.hash = hash != undefined ? hash : this.caculateHash()
-        this.difficulty = difficulty
         this.nonce = 0
     }
 

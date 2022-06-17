@@ -1,6 +1,11 @@
 const dotenv = require('dotenv');
 dotenv.config();
 const sha256 = require("crypto-js/sha256");
+const {ec} = require('elliptic');
+const { addToTransactionPool } = require('./transactionPool');
+const { broadcast } = require('./p2pServer');
+const { MessageType } = require('./constance');
+const EC = new ec('secp256k1');
 
 class UnspentTxOut {
     constructor(txOutId, txOutIndex, address, amount) {
@@ -29,11 +34,8 @@ class TxOut {
 class Transaction {
     constructor(){
         this.id = ""
-        this.txIns = [{'signature': '', 'txOutId': '', 'txOutIndex': 0}]
-        this.txOuts = [{
-            'address': '044a916f2a55fc5233b4f335da34e9bd40f2435c23ee9b534c3a607c3fedf64534b57aeaab6f8593a1d5c4c2829067ba5ceb36a507df1d6274648e2f1ba462a821',
-            'amount': 500
-        }]
+        this.txIns = []
+        this.txOuts = []
     }
 
     // return string
@@ -57,12 +59,29 @@ class Transaction {
         }
         if (this.id !== this.getTransactionId())
         {
+            console.log("not same id")
             return false;
         }
         for (var item in this.TxIns)
         {
             if (this.validateTxIn(item) === false)
             {
+                return false;
+            }
+        }
+        if (this.txIns.length === 0)
+        {
+            return false;
+        }
+
+        // check signature
+        const publicKey = this.txIns[0].txOutId;
+        const key = EC.keyFromPublic(publicKey, 'hex')
+        for (var item in this.TxIns)
+        {
+            if (key.verify(this.id, item.signature) === false)
+            {
+                console.log("key not same signature")
                 return false;
             }
         }
@@ -104,17 +123,46 @@ const getCoinbaseTransaction = (minerAddress, blockIndex) => {
     return t;
 };
 
-const addTransaction = (receiverAddress, amount, minerAddress, hash) => {
-    const transactionCoinBase =  getCoinbaseTransaction(minerAddress, getBlockChain().getLast().index + 1)
+const toHexString = (byteArray) => {
+    return Array.from(byteArray, (byte) => {
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('');
+};
 
-    const newBlock= new Block(blockChain.getLast().index + 1, blockChain.getLast().prevHash, data.data, blockChain.difficulty, hash);
-    if(getBlockChain().addBlock(newBlock))
+
+const getSignature = (tx, privateKey) =>{
+    const key = EC.keyFromPrivate(privateKey, 'hex');
+    const signature = toHexString(key.sign(tx.id).toDER());
+    return signature
+}
+
+const createTransaction = (txIns, txOuts, id) => {
+    tx = new Transaction()
+    tx.txIns = txIns
+    tx.txOuts = txOuts
+    tx.id = id
+    
+    if (tx.validateTransaction() === false)
     {
-        res.send(newBlock);
-        return;
+        return false;
     }
+
+    try{
+        addToTransactionPool(tx)
+        broadcast(MessageType.ADD_TRANSACTION_TO_POOL,tx)
+    }
+    catch(e)
+    {
+        console.log(e);
+        return false
+    }
+    
+    return true;
 }
 
 module.exports = {
-    Transaction
+    Transaction,
+    createTransaction,
+    getSignature,
+    toHexString
 }

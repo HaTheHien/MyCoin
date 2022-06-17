@@ -1,17 +1,10 @@
 const { ioClient } = require("socket.io-client");
 const express = require('express');
 const { getBlockChain, BlockChain } = require("./blockChain");
+const { updateAllTransactionPool, addToTransactionPool } = require("./transactionPool");
+const { MessageType } = require("./constance");
 
 const sockets = [];
-
-const MessageType =  {
-    "QUERY_LATEST": "QUERY_LATEST",
-    "RESPONSE_LASTBLOCK":"RESPONSE_LASTBLOCK",
-    "QUERY_ALL":"QUERY_ALL",
-    "RESPONSE_BLOCKCHAIN":"RESPONSE_BLOCKCHAIN",
-    "QUERY_TRANSACTION_POOL":"QUERY_TRANSACTION_POOL",
-    "RESPONSE_TRANSACTION_POOL": "RESPONSE_TRANSACTION_POOL",
-}
 
 const getSockets = ()=>{
     return sockets;
@@ -44,6 +37,13 @@ const initP2P = (p2pPort)=>{
 
 const queryChainLengthMsg = (io) => io.emit(MessageType.QUERY_LATEST, null);
 
+const broadcast = (type, message) =>{
+    for (var item in sockets)
+    {
+        item.emit(type, message);
+    }
+} 
+
 const queryTransactionPoolMsg = (io) => io.emit(MessageType.QUERY_TRANSACTION_POOL, null)
 
 initHandleMessage = (io) =>{
@@ -67,7 +67,16 @@ initHandleMessage = (io) =>{
         
     })
     io.on(MessageType.RESPONSE_TRANSACTION_POOL, (data)=>{
-        
+        updateAllTransactionPool(data);
+    })
+    io.on(MessageType.ADD_TRANSACTION_TO_POOL, (data) =>{
+        try{
+            addToTransactionPool(data)
+        }
+        catch(e)
+        {
+            
+        }
     })
     
 }
@@ -97,4 +106,6 @@ module.exports = {
     initP2P,
     conectPeer,
     getSockets,
+    broadcast,
+    sockets
 }

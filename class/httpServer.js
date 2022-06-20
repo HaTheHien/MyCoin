@@ -1,10 +1,11 @@
-const { conectPeer, getSockets } = require('./p2pServer')
+const { conectPeer, getSockets, broadcast } = require('./p2pServer')
 const bodyParser = require('body-parser');
 const express = require('express');
 const { getBlockChain } = require('./blockChain');
 const Block = require('./block');
-const { findTransaction, getTransactionPool } = require('./transactionPool');
-const { createTransaction } = require('./transaction');
+const { findTransaction, getTransactionPool, removeTransactionPool } = require('./transactionPool');
+const { createTransaction, getCoinbaseTransaction, findAUnspentTxOuts } = require('./transaction');
+const { MessageType } = require('./constance');
 
 const initHttpServer = (myHttpPort) => {
     const app = express();
@@ -22,23 +23,53 @@ const initHttpServer = (myHttpPort) => {
         res.send(findTransaction(req.params.id))
     });
 
+    app.get('/unspentTransactions', (req, res) => {
+        const publicAddress = req.body.publicAddress
+        res.send(findAUnspentTxOuts(publicAddress))
+    });
+
     app.post('/mineBlock', (req, res) => {
         const transactionId = req.body.transactionId
         const minerAddress = req.body.minerAddress;
         const hash = req.body.hash
+        const nonce = req.body.nonce
 
-        res.send(true)
+        const tx = findTransaction(transactionId);
+
+        if (tx === undefined)
+        {
+            res.send("Not found transaction")
+        }
+
+        const minerTx = getCoinbaseTransaction(minerAddress);
+
+        const block = new Block(getBlockChain().getLast().index + 1, getBlockChain().getLast().hash, tx, getBlockChain().difficulty, hash, undefined, minerTx)
+        block.nonce = nonce
+
+        const check = getBlockChain().addBlock(block);
+
+        if (check === true)
+        {
+            broadcast(MessageType.RESPONSE_LASTBLOCK, block)
+
+            // update transaction pool
+            removeTransactionPool(tx)
+            broadcast(MessageType.RESPONSE_TRANSACTION_POOL, getTransactionPool())
+        }
+
+        res.send(check)
     });
 
     app.post('/createTransaction', (req, res) => {
-        const data = req.body
+        const data = req.body.data
+        const publicAddress = req.body.publicAddress
         if (data.txIns === null || data.txOuts === null || data.id === null) 
         {
             res.send(false);
             return
         }
         
-        if (createTransaction(data.txIns, data.txOuts, data.id) === false)
+        if (createTransaction(data.txIns, data.txOuts, data.id, publicAddress) === false)
         {
             res.send(false)
             return;

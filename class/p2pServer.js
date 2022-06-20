@@ -1,8 +1,9 @@
 const { ioClient } = require("socket.io-client");
 const express = require('express');
 const { getBlockChain, BlockChain } = require("./blockChain");
-const { updateAllTransactionPool, addToTransactionPool } = require("./transactionPool");
+const { updateAllTransactionPool, addToTransactionPool, getTransactionPool } = require("./transactionPool");
 const { MessageType } = require("./constance");
+const Block = require("./block");
 
 const sockets = [];
 
@@ -62,12 +63,19 @@ initHandleMessage = (io) =>{
         {
             io.emit(MessageType.QUERY_ALL)
         }
+        if (getBlockChain().chain.length - 1 === data.index && getBlockChain().chain[0].timestamp > data.timestamp)
+        {
+            this.chain[this.chain.length - 1] = new Block(data.index, data.preHash, data.data, data.difficulty, data.hash, data.timestamp, data.mineData)
+        }
     })
     io.on(MessageType.QUERY_TRANSACTION_POOL,(data)=>{
-        
+        io.emit(MessageType.RESPONSE_TRANSACTION_POOL, getTransactionPool());
     })
     io.on(MessageType.RESPONSE_TRANSACTION_POOL, (data)=>{
-        updateAllTransactionPool(data);
+        if (data.length > getTransactionPool().length)
+        {
+            updateAllTransactionPool(data);
+        }
     })
     io.on(MessageType.ADD_TRANSACTION_TO_POOL, (data) =>{
         try{

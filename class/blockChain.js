@@ -10,7 +10,7 @@ const genesisBlock = new Block(
         }],
         'id': '255fcd8a2eded4f036b397c4f83b724a2c18d8738e7fe5d479c95845eb5de617'
     }, 
-    this.difficulty, 1465154705
+    this.difficulty, undefined, 1465154705
 );
 
 var blocks = null;
@@ -34,7 +34,7 @@ class BlockChain{
     }
 
     addBlock(newBlock){
-        if (checkValidNewBlock(newBlock, this.getLast())) {
+        if (this.checkValidNewBlock(newBlock, this.getLast())) {
             this.chain.push(newBlock);
             return true;
         }
@@ -66,14 +66,17 @@ class BlockChain{
         }
         if (preBlock.hash !== newBlock.prevHash)
         {
+            console.log("Not same pre hash")
             return false;
         }
         if (newBlock.hash !== newBlock.caculateHash())
         {
+            console.log("Hash not correct")
             return false;
         }
         if(!newBlock.hash.startsWith('0'.repeat(this.difficulty)))
         {
+            console.log("Not correct diffcult in hash")
             return false;
         }
         return true;

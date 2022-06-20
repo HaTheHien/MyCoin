@@ -4,8 +4,8 @@ const getTransactionPool = ()=>{
     return transactionPool;
 }
 
-const addToTransactionPool = (tx) => {
-    if (!tx.validateTransaction()) {
+const addToTransactionPool = (tx, publicAddress) => {
+    if (!tx.validateTransaction(publicAddress)) {
         throw Error('Trying to add invalid tx to pool');
     }
 
@@ -22,9 +22,10 @@ const findTransaction = (id) =>{
 
 const removeTransactionPool = (tx) => {
     var newTransactionPool = []
-    for (var item in transactionPool)
+    for (var index=0;index< transactionPool.length; index++)
     {
-        if (item.id != tx.id)
+        var item = transactionPool[index];
+        if (item.id !== tx.id)
         {
             newTransactionPool.push(item);
         }

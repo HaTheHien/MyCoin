@@ -112,7 +112,6 @@ const conectPeer = (domain) =>{
 
     io.on('connect', (socket) => {
         console.log('New socket connection ');
-        sockets.push(io);
         initConnection(io);
     });
 

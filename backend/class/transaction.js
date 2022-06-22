@@ -1,9 +1,8 @@
 const dotenv = require('dotenv');
 dotenv.config();
 const sha256 = require("crypto-js/sha256");
-const {ec} = require('elliptic');
+const { ec } = require('elliptic');
 const { addToTransactionPool, getTransactionPool } = require('./transactionPool');
-const { broadcast } = require('./p2pServer');
 const { MessageType } = require('./constance');
 const { getBlockChain } = require('./blockChain');
 const EC = new ec('secp256k1');
@@ -87,7 +86,7 @@ class Transaction {
 
         if (totalTxInValues !== totalTxOutValues)
         {
-            console.log("In and out not same");
+            console.log("Current unspentTx in and out not same");
             return false;
         }
 
@@ -165,18 +164,12 @@ const findAUnspentTxOuts = (publicAddress) =>{
     }
     for (var index=0; index < getTransactionPool().length; index++) {
         const data = getTransactionPool()[index];
-        // for (var index2 = 0; index2 < data.txOuts.length; index2++) {
-        //     const item2 = data.txOuts[index2]
-        //     if (item2.address === publicAddress) {
-        //         unspentTxOuts.push(new UnspentTxOut('', '', item2.address, item2.amount))
-        //     }
-        // }
         if (data.txIns.length > 0)
         {
             if (data.id !== "" && key.verify(data.id, data.txIns[0].signature) === true) {
                 for (var index2=0;index2< data.txOuts.length; index2++) {
                     const item2 = data.txOuts[index2]
-                    unspentTxOuts.push(new UnspentTxOut('', '', item2.address, -item2.amount))
+                    unspentTxOuts.push(new UnspentTxOut('transaction pool', 'transaction pool', item2.address, -item2.amount))
                 }
             }
         }
@@ -223,7 +216,6 @@ const createTransaction = (txIns, txOuts, id, publicAddress) => {
 
     try{
         addToTransactionPool(tx, publicAddress)
-        broadcast(MessageType.ADD_TRANSACTION_TO_POOL,tx)
     }
     catch(e)
     {

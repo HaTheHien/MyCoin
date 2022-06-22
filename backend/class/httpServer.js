@@ -4,7 +4,7 @@ const express = require('express');
 const { getBlockChain } = require('./blockChain');
 const Block = require('./block');
 const { findTransaction, getTransactionPool, removeTransactionPool } = require('./transactionPool');
-const { createTransaction, getCoinbaseTransaction, findAUnspentTxOuts } = require('./transaction');
+const { createTransaction, getCoinbaseTransaction, findAUnspentTxOuts, Transaction } = require('./transaction');
 const { MessageType } = require('./constance');
 
 const initHttpServer = (myHttpPort) => {
@@ -53,8 +53,8 @@ const initHttpServer = (myHttpPort) => {
             broadcast(MessageType.RESPONSE_LASTBLOCK, block)
 
             // update transaction pool
-            removeTransactionPool(tx)
-            broadcast(MessageType.RESPONSE_TRANSACTION_POOL, getTransactionPool())
+            removeTransactionPool(tx.id)
+            broadcast(MessageType.REMOVE_TRANSACTION_FROM_POOL, tx)
         }
 
         res.send(check)
@@ -74,12 +74,19 @@ const initHttpServer = (myHttpPort) => {
             res.send(false)
             return;
         }
+
+        tx = new Transaction()
+        tx.txIns = data.txIns
+        tx.txOuts = data.txOuts
+        tx.id = data.id
+
+        broadcast(MessageType.ADD_TRANSACTION_TO_POOL,{tx,publicAddress})
         
         res.send(true);
     });
 
     app.get('/peers', (req, res) => {
-        res.send(getSockets().map(( s ) => s._socket.remoteAddress + ':' + s._socket.remotePort));
+        res.send(getSockets().map(( item ) => item.io.socket.toString));
     });
 
     app.post('/addPeer', (req, res) => {

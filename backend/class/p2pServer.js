@@ -1,9 +1,10 @@
-const { ioClient } = require("socket.io-client");
+const ioClient = require("socket.io-client");
 const express = require('express');
 const { getBlockChain, BlockChain } = require("./blockChain");
-const { updateAllTransactionPool, addToTransactionPool, getTransactionPool } = require("./transactionPool");
+const { updateAllTransactionPool, addToTransactionPool, getTransactionPool, removeTransactionPool } = require("./transactionPool");
 const { MessageType } = require("./constance");
 const Block = require("./block");
+const { Transaction } = require("./transaction");
 
 const sockets = [];
 
@@ -39,8 +40,9 @@ const initP2P = (p2pPort)=>{
 const queryChainLengthMsg = (io) => io.emit(MessageType.QUERY_LATEST, null);
 
 const broadcast = (type, message) =>{
-    for (var item in sockets)
+    for (var index =0;index<sockets.length;index++)
     {
+        var item = sockets[index];
         item.emit(type, message);
     }
 } 
@@ -72,18 +74,33 @@ initHandleMessage = (io) =>{
         io.emit(MessageType.RESPONSE_TRANSACTION_POOL, getTransactionPool());
     })
     io.on(MessageType.RESPONSE_TRANSACTION_POOL, (data)=>{
-        if (data.length > getTransactionPool().length)
+        var txs = [];
+        for (var index=0;index <data.length;index++)
         {
-            updateAllTransactionPool(data);
+            var item = data[index]
+            var tx = new Transaction()
+            tx.id = item.id
+            tx.txIns = item.txIns
+            tx.txOuts = item.txOuts
+            txs.push(tx)
         }
+        updateAllTransactionPool(txs);
+    })
+    io.on(MessageType.REMOVE_TRANSACTION_FROM_POOL, (data)=>{
+        const id = data.id;
+        removeTransactionPool(id)
     })
     io.on(MessageType.ADD_TRANSACTION_TO_POOL, (data) =>{
         try{
-            addToTransactionPool(data)
+            var tx = new Transaction()
+            tx.id = data.tx.id
+            tx.txIns = data.tx.txIns
+            tx.txOuts = data.tx.txOuts
+            addToTransactionPool(tx,data.publicAddress)
         }
         catch(e)
         {
-            
+            console.log(e)
         }
     })
     
@@ -97,9 +114,9 @@ const initConnection = (io) => {
 }
 
 const conectPeer = (domain) =>{
-    const io = ioClient(domain)
+    const io = ioClient.io(domain)
 
-    io.on('connection', (socket) => {
+    io.on('connect', (socket) => {
         console.log('New socket connection ');
         sockets.push(io);
         initConnection(io);

@@ -20,12 +20,12 @@ const findTransaction = (id) =>{
     return transactionPool.find((item)=>item.id = id);
 }
 
-const removeTransactionPool = (tx) => {
+const removeTransactionPool = (id) => {
     var newTransactionPool = []
     for (var index=0;index< transactionPool.length; index++)
     {
         var item = transactionPool[index];
-        if (item.id !== tx.id)
+        if (item.id !== id)
         {
             newTransactionPool.push(item);
         }

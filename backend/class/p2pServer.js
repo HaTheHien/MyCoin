@@ -1,10 +1,11 @@
 const ioClient = require("socket.io-client");
-const express = require('express');
 const { getBlockChain, BlockChain } = require("./blockChain");
 const { updateAllTransactionPool, addToTransactionPool, getTransactionPool, removeTransactionPool } = require("./transactionPool");
 const { MessageType } = require("./constance");
 const Block = require("./block");
 const { Transaction } = require("./transaction");
+
+const { Server } = require('socket.io');
 
 const sockets = [];
 
@@ -12,19 +13,12 @@ const getSockets = ()=>{
     return sockets;
 }
 
-const initP2P = (p2pPort)=>{
-    const app = express();
-    const http = require('http').Server(app);
-
-    http.listen(p2pPort, () => {
-        console.log(`Socket listening on port: ${p2pPort}`);
-    });
-
-    const io = require('socket.io')(http,{
+const initP2P = (server)=>{
+    const io = new Server(server, {
         cors: {
             origin: '*',
         }
-    })
+    });
 
     io.on('connection', (socket) => {
         console.log('P2P connection ');

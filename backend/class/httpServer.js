@@ -7,10 +7,7 @@ const { findTransaction, getTransactionPool, removeTransactionPool } = require('
 const { createTransaction, getCoinbaseTransaction, findAUnspentTxOuts, Transaction } = require('./transaction');
 const { MessageType } = require('./constance');
 
-const initHttpServer = (myHttpPort) => {
-    const app = express();
-    app.use(bodyParser.json());
-
+const initHttpServer = (app) => {
     app.get('/blocks', (req, res) => {
         res.send(getBlockChain().chain);
     });
@@ -86,7 +83,7 @@ const initHttpServer = (myHttpPort) => {
     });
 
     app.get('/peers', (req, res) => {
-        res.send(getSockets().map(( item ) => item.io.socket.toString));
+        res.send(getSockets().map(( item ) => item.id));
     });
 
     app.post('/addPeer', (req, res) => {
@@ -97,10 +94,6 @@ const initHttpServer = (myHttpPort) => {
     app.post('/stop', (req, res) => {
         res.send({'msg' : 'stopping server'});
         process.exit();
-    });
-    
-    app.listen(myHttpPort, () => {
-        console.log(`App listening on port: ${myHttpPort}`);
     });
 };
 

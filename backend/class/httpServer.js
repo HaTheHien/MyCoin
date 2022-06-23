@@ -20,7 +20,7 @@ const initHttpServer = (app) => {
         res.send(findTransaction(req.params.id))
     });
 
-    app.get('/unspentTransactions', (req, res) => {
+    app.post('/unspentTransactions', (req, res) => {
         const publicAddress = req.body.publicAddress
         res.send(findAUnspentTxOuts(publicAddress))
     });

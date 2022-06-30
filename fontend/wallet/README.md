@@ -1,24 +1,28 @@
-# wallet
+# Ouchtion Front-end
 
-## Project setup
-```
-npm install
-```
+Web++
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
 
-### Lints and fixes files
-```
-npm run lint
+## Getting started
+
+```sh
+# Setup
+yarn
+
+# Starts dev server
+yarn dev
+
+# Build for production
+yarn build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+## The stack
+
+*   Vue 2 (due to Vuetify 2)
+*   Vuetify 2 (Vuetify 3 is currently in alpha)
+*   Vuex (state management)
+*   Vue Router (nagivation)
+

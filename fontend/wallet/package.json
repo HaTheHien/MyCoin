@@ -1,46 +1,73 @@
 {
-  "name": "wallet",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "core-js": "^3.8.3",
-    "elliptic": "^6.5.4",
-    "vue": "^3.2.13",
-    "vue-router": "^4.0.16"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
+    "name": "my-coin",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
     },
-    "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
+    "dependencies": {
+        "@fontsource/inter": "^4.5.1",
+        "@hcaptcha/vue-hcaptcha": "^0.3.2",
+        "@mdi/font": "^6.5.95",
+        "axios": "^0.24.0",
+        "core-js": "^3.6.5",
+        "dayjs": "^1.10.7",
+        "jose": "^4.3.8",
+        "lodash-es": "^4.17.21",
+        "socket.io-client": "^4.4.1",
+        "source-map": "^0.7.3",
+        "tiptap-vuetify": "^2.24.0",
+        "vue": "^2.6.11",
+        "vue-line-clamp": "^1.3.2",
+        "vue-nprogress": "^0.2.0",
+        "vue-router": "^3.2.0",
+        "vuetify": "^2.4.0",
+        "vuex": "^3.4.0"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "~4.5.0",
+        "@vue/cli-plugin-eslint": "~4.5.0",
+        "@vue/cli-plugin-router": "~4.5.0",
+        "@vue/cli-plugin-vuex": "~4.5.0",
+        "@vue/cli-service": "~4.5.0",
+        "@vue/eslint-config-prettier": "^6.0.0",
+        "babel-eslint": "^10.1.0",
+        "eslint": "^6.7.2",
+        "eslint-plugin-prettier": "^3.3.1",
+        "eslint-plugin-vue": "^6.2.2",
+        "prettier": "^2.2.1",
+        "sass": "~1.32.0",
+        "sass-loader": "^10.0.0",
+        "vue-cli-plugin-vuetify": "~2.4.5",
+        "vue-template-compiler": "^2.6.11",
+        "vuetify-loader": "^1.7.0"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/essential",
+            "eslint:recommended",
+            "@vue/prettier"
+        ],
+        "parserOptions": {
+            "parser": "babel-eslint"
+        },
+        "rules": {}
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not dead"
     ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ]
+    "prettier": {
+        "tabWidth": 4,
+        "printWidth": 120,
+        "endOfLine": "lf",
+        "useTabs": false
+    }
 }

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/HaTheHien/MyCoin#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "elliptic": "^6.5.4",

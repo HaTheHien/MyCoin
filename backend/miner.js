@@ -2,7 +2,7 @@ const Block = require("./class/block");
 
 var block = new Block(
     1,
-    "cfe87b49ea9d0fc6b06cab67e8c2995b74cd37d680238033ef54e832c70580d9",
+    "02ee01ad38fa67d1d86ca89370ba2c832c926482dd795140406ad32d35fb8a72",
     {
         "id": "456cfdc7ce9850c14602d4bbced85f3c56db40828f6260e04d44ab57212327ef",
         "txIns": [

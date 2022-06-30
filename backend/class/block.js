@@ -7,14 +7,14 @@ class Block{
         this.prevHash = prevHash
         this.data = data
         this.difficulty = difficulty != undefined ? difficulty : 2
-        this.timestamp = timestamp != undefined ? timestamp : new Date().getMilliseconds
+        this.timestamp = timestamp != undefined ? timestamp : new Date().getTime()
         this.hash = hash != undefined ? hash : this.caculateHash()
         this.nonce = 0
         this.mineData = mineData != undefined ? mineData : undefined
     }
 
     caculateHash(){
-        return sha256(this.prevHash + JSON.stringify(this.data) + this.timestamp + this.nonce).toString();
+        return sha256(this.prevHash + JSON.stringify(this.data) + this.nonce).toString();
     }
 
     mine(){

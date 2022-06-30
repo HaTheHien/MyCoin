@@ -20,7 +20,7 @@ export default {
     methods: {
         login() {
           localStorage.setItem("privateKey_myCoin", this.privateKey);
-          this.$router.push("/user")
+          this.$router.push({ name: "User" })
         },
     },
 };

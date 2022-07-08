@@ -23,6 +23,10 @@ function getBlockChain(){
     return blocks;
 }
 
+const findTransactionInBlock = (id) =>{
+    return blocks.chain.find((item)=>item.data.id = id);
+}
+
 class BlockChain{
     constructor(difficulty) {
         this.chain = [genesisBlock]
@@ -95,4 +99,5 @@ class BlockChain{
 module.exports = {
     getBlockChain,
     initBlockChain,
+    findTransactionInBlock,
 }

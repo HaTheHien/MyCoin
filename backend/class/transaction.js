@@ -36,6 +36,7 @@ class Transaction {
         this.id = ""
         this.txIns = []
         this.txOuts = []
+        this.publicKey = ""
     }
 
     // return string
@@ -208,6 +209,7 @@ const createTransaction = (txIns, txOuts, id, publicAddress) => {
     tx.txIns = txIns
     tx.txOuts = txOuts
     tx.id = id
+    tx.publicKey = publicAddress
     
     if (tx.validateTransaction(publicAddress) === false)
     {

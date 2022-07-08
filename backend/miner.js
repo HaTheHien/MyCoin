@@ -21,7 +21,8 @@ var block = new Block(
                 "address": "044a916f2a55fc5233b4f335da34e9bd40f2435c23ee9b534c3a607c3fedf64534b57aeaab6f8593a1d5c4c2829067ba5ceb36a507df1d6274648e2f1ba462a821",
                 "amount": 480
             }
-        ]
+        ],
+        "publicKey": "044a916f2a55fc5233b4f335da34e9bd40f2435c23ee9b534c3a607c3fedf64534b57aeaab6f8593a1d5c4c2829067ba5ceb36a507df1d6274648e2f1ba462a821"
     },
     2
 )

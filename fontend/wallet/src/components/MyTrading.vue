@@ -6,23 +6,25 @@
                 :headers="headers"
                 :items="list"
                 :items-per-page="5"
-                :single-expand="true"
-                :show-expand="true"
                 item-key="txOutId"
+                show-expand
                 class="elevation-1"
             >
             <template v-slot:item.address="{ item }">
-                <p class="ma-4" style="width:200px">{{item.address}}</p>
+                <p v-if="item.address == publicKey" class="ma-4" style="color:green">{{item.address}}</p>
+                <p v-else class="ma-4">{{item.address}}</p>
             </template>
             <template v-slot:item.txOutId="{ item }">
-                <p v-if="item.txOutId != 'transaction pool' " style="width:200px">{{item.txOutId}}</p>
+                <p v-if="item.txOutId != 'transaction pool' ">{{item.txOutId}}</p>
                 <p v-else class="ma-4">{{item.txOutId}}</p>
             </template>
-            <!-- <template v-slot:expanded-item="{ headers, item }">
-                <td :colspan="headers.length">
-                    More info about {{item.address}}
-                </td>
-            </template> -->
+            <template v-slot:expanded-item="{ headers, item }">
+                <tr :colspan="headers.length" md4 v-for="itemData in item.txOuts">
+                    <p v-if="itemData.amount < 0 " :colspan="headers.length" class="ma-4" style="width:200px;color:red">{{itemData.address + " " + itemData.amount}}</p>
+                    <p v-if="itemData.amount > 0 " :colspan="headers.length" class="ma-4" style="width:200px;color:green">{{itemData.address + " +" + itemData.amount}}</p>
+                </tr>
+
+            </template>
             </v-data-table>
         </div>
     </div>
@@ -41,8 +43,6 @@ export default {
                     value: 'txOutId',
                 },
                 { text: 'Block chain index', value: 'txOutIndex' },
-                { text: 'Address', value: 'address', },
-                { text: 'Amount (vtc)', value: 'amount', },
             ],
             privateKey: "",
         };
@@ -50,7 +50,7 @@ export default {
     created() {
         this.privateKey = localStorage.getItem("privateKey_myCoin");
     },
-    props: ["list"],
+    props: ["list","publicKey"],
     methods: {
         getTransaction() {
             return axios.get(`http://localhost:3000/blocks`);

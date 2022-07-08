@@ -1,7 +1,7 @@
 const { conectPeer, getSockets, broadcast } = require('./p2pServer')
 const bodyParser = require('body-parser');
 const express = require('express');
-const { getBlockChain } = require('./blockChain');
+const { getBlockChain, findTransactionInBlock } = require('./blockChain');
 const Block = require('./block');
 const { findTransaction, getTransactionPool, removeTransactionPool } = require('./transactionPool');
 const { createTransaction, getCoinbaseTransaction, findAUnspentTxOuts, Transaction } = require('./transaction');
@@ -17,7 +17,12 @@ const initHttpServer = (app) => {
     });
 
     app.get('/transaction/:id', (req, res) => {
-        res.send(findTransaction(req.params.id))
+        var first = findTransaction(req.params.id)
+        if (first !== undefined)
+        {
+            return res.send(first)
+        }
+        return res.send(findTransactionInBlock(req.params.id))
     });
 
     app.post('/unspentTransactions', (req, res) => {
@@ -76,6 +81,7 @@ const initHttpServer = (app) => {
         tx.txIns = data.txIns
         tx.txOuts = data.txOuts
         tx.id = data.id
+        tx.publicKey = publicAddress
 
         broadcast(MessageType.ADD_TRANSACTION_TO_POOL,{tx,publicAddress})
         

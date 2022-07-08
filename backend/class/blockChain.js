@@ -71,11 +71,13 @@ class BlockChain{
         if (preBlock.hash !== newBlock.prevHash)
         {
             console.log("Not same pre hash")
+            console.log(newBlock)
             return false;
         }
         if (newBlock.hash !== newBlock.caculateHash())
         {
             console.log("Hash not correct")
+            console.log(newBlock)
             return false;
         }
         if(!newBlock.hash.startsWith('0'.repeat(this.difficulty)))

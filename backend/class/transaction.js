@@ -188,6 +188,7 @@ const getCoinbaseTransaction = (minerAddress) => {
     t.txIns = [txIn];
     t.txOuts = [new TxOut(minerAddress, process.env.COINBASE_AMOUNT)];
     t.id = t.getTransactionId(t);
+    t.publicKey = undefined
     return t;
 };
 

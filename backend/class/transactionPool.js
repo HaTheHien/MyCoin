@@ -12,6 +12,7 @@ const addToTransactionPool = (tx, publicAddress) => {
     if (!isValidTxForPool(tx)) {
         throw Error('Trying to add invalid tx to pool');
     }
+    console.log("add transaction")
 
     transactionPool.push(tx);
 };

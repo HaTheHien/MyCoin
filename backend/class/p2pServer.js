@@ -57,11 +57,14 @@ initHandleMessage = (io) =>{
     io.on(MessageType.RESPONSE_LASTBLOCK,(data)=>{
         if (getBlockChain().chain.length <= data.index)
         {
-            io.emit(MessageType.QUERY_ALL)
+            console.log("add new block")
+            var newBlock = new Block(data.index, data.prevHash, data.data, data.difficulty, data.hash, data.timestamp, data.mineData);
+            newBlock.nonce = data.nonce
+            getBlockChain().addBlock(newBlock)
         }
         if (getBlockChain().chain.length - 1 === data.index && getBlockChain().chain[0].timestamp > data.timestamp)
         {
-            this.chain[this.chain.length - 1] = new Block(data.index, data.preHash, data.data, data.difficulty, data.hash, data.timestamp, data.mineData)
+            getBlockChain().chain[this.chain.length - 1] = new Block(data.index, data.prevHash, data.data, data.difficulty, data.hash, data.timestamp, data.mineData)
         }
     })
     io.on(MessageType.QUERY_TRANSACTION_POOL,(data)=>{
@@ -76,6 +79,7 @@ initHandleMessage = (io) =>{
             tx.id = item.id
             tx.txIns = item.txIns
             tx.txOuts = item.txOuts
+            tx.publicKey = item.publicKey
             txs.push(tx)
         }
         updateAllTransactionPool(txs);
@@ -90,6 +94,7 @@ initHandleMessage = (io) =>{
             tx.id = data.tx.id
             tx.txIns = data.tx.txIns
             tx.txOuts = data.tx.txOuts
+            tx.publicKey = data.tx.publicKey
             addToTransactionPool(tx,data.publicAddress)
         }
         catch(e)
